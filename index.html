@@ -4,16 +4,36 @@
 <!-- ----------------------------------------------------------------- -->
 <!-- ----------------------------------------------------------------- -->
 <!-- ----------------------------------------------------------------- -->
-<head> <!-- header begins here -->
+
+<head>
+  <!-- header begins here -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
   <meta name="author" content="">
 
   <link href="./assets/css/style.css" rel="stylesheet">
-  <script type="text/javascript" src="./assets/js/utils.js"></script>
-  <script type="text/javascript" src="./assets/js/numbers.js"></script>
-  <script type="text/javascript" src="./assets/js/header-functions.js"></script>
+
+  <script type="text/javascript">
+
+    var x = new XMLHttpRequest();
+    x.open('get', 'data.txt', true); 
+      x.onreadystatechange= showdata;
+      x.send(null);
+    console.log("TEST1");
+    
+    console.log("TEST3");
+    function showdata() {
+      if(x.readyState==4) {
+        var el = document.getElementById('content');
+        console.log(x.responseText);
+      }
+    }
+    console.log("TEST4");
+    </script>
+
+  <!-- <script type="text/javascript" src="./assets/js/utils.js"></script> -->
+  <!-- <script type="text/javascript" src="./assets/js/header-functions.js"></script> -->
 
 </head> <!-- header ends here -->
 <!-- ----------------------------------------------------------------- -->
@@ -34,13 +54,18 @@
 <!-- ---------------------------------------------------------------------------------- -->
 <!-- ---------------------------------------------------------------------------------- -->
 <!-- ---------------------------------------------------------------------------------- -->
-<body> <!-- body begins here -->
+
+<body>
+  <!-- body begins here -->
+  <input type="file" id="fileinput" />
 
   <!-- ====================================================== -->
   <!-- ====================================================== -->
   <footer>
     <!-- footer of page begins here -->
-    <script type="text/javascript" src="./assets/js/footer-functions.js"></script>
+    <!-- <script type="text/javascript" src="./assets/js/read-files.js"></script> -->
+    <!-- <script type="text/javascript" src="./assets/js/footer-functions.js"></script> -->
+    <script type="text/javascript" src="./assets/js/dictionary.js"></script>
   </footer> <!-- footer of page ends here -->
   <!-- ====================================================== -->
   <!-- ====================================================== -->
