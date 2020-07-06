@@ -1,38 +1,6 @@
-//Initialize Dictionary
-let fileInput = document.getElementById('fileinput');
-fileInput.addEventListener('change', start, false);
-
-function start(event) {
-    console.log(event);
-    var file = event.target.files[0];
-    var secondFile = new File([""], "data.txt", {type: "text/plain"});
-    secondFile.name = "data.txt";
-    console.log(file);
-    console.log(secondFile);
-    var fileReader = new FileReader();
-    fileReader.onload = function (event) {
-        let contents = event.target.result;
-        let dictionary = initDictionary(contents);
-        console.log(dictionary);
-        var word = new Word("DONUT", ["D", "OW1", "N", "AH2", "T"]);
-        console.log("IDENTICAL PRON");
-        console.log("DONUT:");
-        console.log(dictionary.determineIdenticalPronunciation(["D", "OW1", "N", "AH2", "T"]));
-
-        console.log("GET PRON");
-        console.log("DONUT:");
-        console.log(dictionary.getPronunciation("DONUT"));
-
-        // console.log("SIMILAR");
-        // console.log(word);
-        // console.log(dictionary.similarWordsWithAddedPhonemes(word));
-        // console.log("\n");
-    };
-    fileReader.readAsText(secondFile);
-}
-
 const SPELLING = 0;
 const PRONUNCIATION = 1;
+const DICTIONARY = null;
 
 function initDictionary(contents) {
     var spellingToWord = new Map();
@@ -69,33 +37,65 @@ class Dictionary {
         this._spellingToWord = spellingToWord;
     }
 
-    get words() {
-        return this._spellingToWord.values();
+    getWord(spelling) {
+        return this._spellingToWord.get(spelling);
     }
 
-    getPronunciation(spelling){
+    getPronunciation(spelling) {
         return this._spellingToWord.get(spelling).pronunciation;
     }
 
     determineSimilarWords(word) {
         var similarWords = new Set();
-        var similarWordsWithAddedPhonemes = similarWordsWithAddedPhonemes(word);
-        for(var index = 0; similarWordsWithAddedPhonemes.length > index; index++){
+        var similarWordsWithAddedPhonemes = this.similarWordsWithAddedPhonemes(word);
+        for (var index = 0; similarWordsWithAddedPhonemes.length > index; index++) {
             similarWords.add(similarWordsWithAddedPhonemes[index]);
         }
-        var similarWordsWithReplacedPhonemes = similarWordsWithReplacedPhonemes(word);
-        for(var index = 0; similarWordsWithReplacedPhonemes.length > index; index++){
+        var similarWordsWithLessPhonemes = this.similarWordsWithLessPhonemes(word);
+        for (var index = 0; similarWordsWithLessPhonemes.length > index; index++) {
+            similarWords.add(similarWordsWithLessPhonemes[index]);
+        }
+        var similarWordsWithReplacedPhonemes = this.similarWordsWithReplacedPhonemes(word);
+        for (var index = 0; similarWordsWithReplacedPhonemes.length > index; index++) {
             similarWords.add(similarWordsWithReplacedPhonemes[index]);
         }
+        //       var identicalPhonemes = this.determineIdenticalPronunciation(word.pronunciation);
+        // for (var index = 0; identicalPhonemes.length > index; index++) {
+        //     similarWords.add(identicalPhonemes[index]);
+        // }
+        // var similarWordsWithAddedPhonemes = this.similarWordsWithAddedPhonemes(word);
+        // for (var index = 0; similarWordsWithAddedPhonemes.length > index; index++) {
+        //     var similarWord = similarWordsWithAddedPhonemes[index];
+        //     if (similarWord.spelling === "CORD") {
+        //         console.log("TIOGIORGRIOIO4343");
+        //     }
+        //     //similarWords.add(similarWord);
+        // }
+        // var similarWordsWithLessPhonemes = this.similarWordsWithLessPhonemes(word);
+        // for (var index = 0; similarWordsWithLessPhonemes.length > index; index++) {
+        //     var similarWord = similarWordsWithLessPhonemes[index];
+        //     if (similarWord.spelling === "DAFT") {
+        //         console.log("TIOGIORGRIOIO4");
+        //     }
+        //     //similarWords.add(similarWord);
+        // }
+        // var similarWordsWithReplacedPhonemes = this.similarWordsWithReplacedPhonemes(word);
+        // for (var index = 0; similarWordsWithReplacedPhonemes.length > index; index++) {
+        //     var similarWord = similarWordsWithReplacedPhonemes[index];
+        //     if (similarWord.spelling === "CORD") {
+        //         console.log("TIOGIORGRIOIO1");
+        //     }
+        //     //similarWords.add(similarWord);
+        // }
+  
         return similarWords;
     }
 
     //returns a list of phonetically identical words.
     determineIdenticalPronunciation(pronunciation) {
         var exactWords = new Array(0);
-
-        for (var index = 0; this.words.length > index; index++) {
-            var word = this.words[index];
+        for (let iterator = this._spellingToWord.values(), r; !(r = iterator.next()).done;) {
+            var word = r.value;
             if (word.isExactPronunciation(pronunciation)) {
                 exactWords.push(word);
             }
@@ -103,37 +103,77 @@ class Dictionary {
         return exactWords;
     }
 
-    determineIdentical
+    //FOR TESTS
+    // if (firstWord.spelling === "DRAFT" && secondWord.spelling === "DAFT") {
+    //     var otherPronunciation = secondWord.pronunciation;
+    //     console.log("D" + (firstWord.spelling !== secondWord.spelling));
+    //     console.log("D" + (firstWord.pronunciation.length === secondWord.pronunciation.length));
+    //     console.log("D" + (firstWord.similarWord(secondWord) + 1 === firstWord.pronunciation.length));
+    //     console.log(firstWord.similarWord(secondWord) + 1);
+    //     console.log(firstWord.pronunciation.length);
+    //     console.log("D" + firstWord.similarWord(secondWord));
+    //     console.log(firstWord.pronunciation);
+    //     console.log(secondWord.pronunciation);
 
-    //return a list of near-phonetically-identical words with additional Phonemes added.
-    similarWordsWithAddedPhonemes(word) {
-        var similarWords = new Array(0);
+    //     var firstPronunciation = firstWord.pronunciation;
+    //     var secondPronunciation = otherPronunciation;
+    //     var count = 0;
+    //     var secondNext = 0;
+    //     var cantGoBack = true;
 
-        for (var index = 0; this.words.length > index; index++) {
-            var otherWord = this.words[index];
-            if (word.spelling !== otherWord.spelling && word.similarWord(otherWord) > word.pronunciation.length) {
-                similarWords.push(otherWord);
-            }
-        }
-        return similarWords;
+    //     for (var firstIndex = 0; firstPronunciation.length > firstIndex; firstIndex++) {
+    //         for (var secondIndex = cantGoBack ? firstIndex : secondNext; secondPronunciation.length > secondIndex; secondIndex++) {
+    //             //                for (var secondIndex = cantGoBack ? (firstIndex > secondNext ? firstIndex : secondNext) :secondNext; secondPronunciation.length > secondIndex; secondIndex++) {
+    //             var phoneme = firstPronunciation[firstIndex];
+    //             var otherPhoneme = secondPronunciation[secondIndex];
+    //             if (phoneme === otherPhoneme) {
+    //                 count++;
+    //                 secondNext = secondIndex + 1;
+    //                 break;
+    //             }
+    //             if (cantGoBack) {
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     console.log("TESTDRE: " + (count));
+    // }
+  
+
+    similarWordsWithLessPhonemes(word) {
+        return this.similarWordsWith(word, function (firstWord, secondWord) {
+            return firstWord.spelling !== secondWord.spelling && firstWord.similarWord(secondWord, false) === firstWord.pronunciation.length - 1 && firstWord.pronunciation.length > secondWord.pronunciation.length;
+        });
     }
+
+    similarWordsWithAddedPhonemes(word) {
+        return this.similarWordsWith(word, function (firstWord, secondWord) {
+            return firstWord.pronunciation.length === secondWord.pronunciation.length - 1 && firstWord.similarWord(secondWord, false) === firstWord.pronunciation.length;
+        });
+    }
+    //AH0 L AY1 N D
+    //AH0 P L AY1 D
+
+  //D R AE1 F T
+    //D AE1 F T
 
     similarWordsWithReplacedPhonemes(word) {
-        var similarWordsWithReplacedPhonemes = new Array(0);
+        return this.similarWordsWith(word, function (firstWord, secondWord) {
+            
+            return firstWord.spelling !== secondWord.spelling && firstWord.pronunciation.length === secondWord.pronunciation.length && firstWord.similarWord(secondWord, true) === firstWord.pronunciation.length - 1;
+        });
+    }
 
-        for (var index = 0; this.words.length > index; index++) {
-            var otherWord = this.words[index];
-            if (word.spelling !== otherWord.spelling && word.pronunciation.length === otherWord.pronunciation.length && word.similarWord(otherWord) > word.pronunciation.length / 2) {
-                similarWordsWithReplacedPhonemes.push(otherWord);
+    similarWordsWith(word, predicate) {
+        var words = new Array();
+        for (let iterator = this._spellingToWord.values(), r; !(r = iterator.next()).done;) {
+            var otherWord = r.value;
+            if (predicate(word, otherWord)) {
+                words.push(otherWord);
             }
         }
-        return similarWordsWithReplacedPhonemes;
+        return words;
     }
-
-    display(word) {
-
-    }
-
 }
 
 class Word {
@@ -161,34 +201,31 @@ class Word {
         return this.similarPronunciation(otherPronunciation) === otherPronunciation.length;
     }
 
-    similarWord(word) {
-        return this.similarPronunciation(word.pronunciation);
+    similarWord(word, cantGoBack) {
+        return this.similarPronunciation(word.pronunciation, cantGoBack);
     }
 
-    similarPronunciation(otherPronunciation) {
-        var smallerPronunciation;
-        var largerPronunciation;
-        if (this.pronunciation.length < otherPronunciation) {
-            smallerPronunciation = this.pronunciation;
-            largerPronunciation = otherPronunciation;
-        } else {
-            smallerPronunciation = otherPronunciation;
-            largerPronunciation = this.pronunciation;
-        }
-
+    similarPronunciation(otherPronunciation, cantGoBack) {
+        var firstPronunciation = this.pronunciation;
+        var secondPronunciation = otherPronunciation;
         var count = 0;
-        var smallerIndex = 0;
-        var largerIndex = 0;
-        while (smallerPronunciation.length > smallerIndex && largerPronunciation.length > largerIndex) {
-            var smallerPhonemes = smallerPronunciation[smallerIndex];
-            var largerPhonemes = largerPronunciation[largerIndex];
-            if (smallerPhonemes === largerPhonemes) {
-                count++;
-                smallerIndex++;
+        var secondNext = 0;
+
+        for (var firstIndex = 0; firstPronunciation.length > firstIndex; firstIndex++) {
+            for (var secondIndex = cantGoBack ? firstIndex : secondNext; secondPronunciation.length > secondIndex; secondIndex++) {
+                //                for (var secondIndex = cantGoBack ? (firstIndex > secondNext ? firstIndex : secondNext) :secondNext; secondPronunciation.length > secondIndex; secondIndex++) {
+                var phoneme = firstPronunciation[firstIndex];
+                var otherPhoneme = secondPronunciation[secondIndex];
+                if (phoneme === otherPhoneme) {
+                    count++;
+                    secondNext = secondIndex + 1;
+                    break;
+                }
+                if (cantGoBack) {
+                    break;
+                }
             }
-            largerIndex++;
         }
-        console.log(this.pronunciation + " " + otherPronunciation + ": " + count);
         return count;
     }
 
@@ -204,3 +241,10 @@ class Word {
         return "{" + this.spelling + " : " + pronunciationAsString + "}";
     }
 }
+
+
+//Initialize Dictionary
+var node = document.getElementById("data");
+var contents = node.textContent;
+var dictionary = initDictionary(contents);
+console.log(dictionary);
